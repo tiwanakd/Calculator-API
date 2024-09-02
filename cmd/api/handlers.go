@@ -25,6 +25,12 @@ func (a *api) add(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sum := nums.A + nums.B
+	err = a.calculations.Insert("'Addition'", nums.A, nums.B, float64(sum))
+	if err != nil {
+		a.logger.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
 	jsonResponse := fmt.Sprintf("{\"result\":%d}\n", sum)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(jsonResponse))
@@ -92,4 +98,8 @@ func (a *api) divide(w http.ResponseWriter, r *http.Request) {
 	jsonResponse := fmt.Sprintf("{\"result\":%0.2f}\n", divide)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(jsonResponse))
+}
+
+func (a *api) allCalculations(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("all calculations"))
 }
