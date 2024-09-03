@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"runtime/debug"
 	"strings"
 )
 
@@ -89,7 +90,6 @@ func (a *api) decodeJSONBody(w http.ResponseWriter, r *http.Request, dst interfa
 			a.logger.Error(err.Error())
 			return err
 		}
-
 	}
 	// Call decode again, using a pointer to an empty anonymous struct as
 	// the destination. If the request body only contained a single JSON
@@ -103,5 +103,14 @@ func (a *api) decodeJSONBody(w http.ResponseWriter, r *http.Request, dst interfa
 	}
 
 	return nil
+}
 
+func (a *api) genericServerError(w http.ResponseWriter, r *http.Request, err error) {
+	var (
+		method = r.Method
+		uri    = r.RequestURI
+		trace  = string(debug.Stack())
+	)
+	a.logger.Error(err.Error(), "method", method, "uri", uri, "trace", trace)
+	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
