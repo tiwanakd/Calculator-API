@@ -54,6 +54,7 @@ func (a *api) subtract(w http.ResponseWriter, r *http.Request) {
 	err = a.calculations.Insert("Subtraction", nums.A, nums.B, float64(subtract))
 	if err != nil {
 		a.genericServerError(w, r, err)
+		return
 	}
 	jsonResponse := fmt.Sprintf("{\"result\":%d}\n", subtract)
 	w.Header().Set("Content-Type", "application/json")
