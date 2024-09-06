@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -113,4 +114,24 @@ func (a *api) genericServerError(w http.ResponseWriter, r *http.Request, err err
 	)
 	a.logger.Error(err.Error(), "method", method, "uri", uri, "trace", trace)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+}
+
+func (a *api) render(w http.ResponseWriter, r *http.Request, status int, page string, data templateData) {
+	ts, ok := a.templateCache[page]
+	if !ok {
+		err := fmt.Errorf("the template %s does not exist", page)
+		a.genericServerError(w, r, err)
+		return
+	}
+
+	buf := new(bytes.Buffer)
+
+	err := ts.ExecuteTemplate(buf, "base", data)
+	if err != nil {
+		a.genericServerError(w, r, err)
+		return
+	}
+
+	w.WriteHeader(status)
+	buf.WriteTo(w)
 }

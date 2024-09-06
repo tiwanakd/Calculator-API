@@ -11,5 +11,7 @@ func (a *api) routes() *http.ServeMux {
 	router.HandleFunc("POST /divide", a.divide)
 	router.HandleFunc("GET /allcalculations", a.allCalculations)
 	router.HandleFunc("GET /getcalculations", a.getCalculations)
+	router.HandleFunc("GET /{$}", a.homeView)
+
 	return router
 }

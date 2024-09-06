@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
@@ -12,8 +13,9 @@ import (
 )
 
 type api struct {
-	logger       *slog.Logger
-	calculations *models.CalculationModel
+	logger        *slog.Logger
+	calculations  *models.CalculationModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -30,9 +32,15 @@ func main() {
 	}
 	defer db.Close()
 
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
 	api := &api{
-		logger:       logger,
-		calculations: &models.CalculationModel{DB: db},
+		logger:        logger,
+		calculations:  &models.CalculationModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	api.logger.Info("server running at port", "addr", *addr)

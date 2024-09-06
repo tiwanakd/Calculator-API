@@ -31,7 +31,6 @@ func (m *CalculationModel) Insert(operation string, numberA, numberB int, result
 }
 
 func (m *CalculationModel) GetAll() ([]Calculation, error) {
-
 	calculations, err := m.get("SELECT * FROM calculations")
 	if err != nil {
 		return nil, err
@@ -41,11 +40,20 @@ func (m *CalculationModel) GetAll() ([]Calculation, error) {
 }
 
 func (m *CalculationModel) GetCalculations(operation string) ([]Calculation, error) {
-
 	stmt := `SELECT * FROM calculations WHERE LOWER(operation)=LOWER($1)`
 	calculations, err := m.get(stmt, operation)
 	if err != nil {
 		return nil, err
+	}
+	return calculations, nil
+}
+
+func (m *CalculationModel) GetLatestCalculations() ([]Calculation, error) {
+	stmt := `SELECT * FROM calculations ORDER BY created DESC LIMIT 5`
+
+	calculations, err := m.get(stmt)
+	if err != nil {
+		return nil, nil
 	}
 	return calculations, nil
 }

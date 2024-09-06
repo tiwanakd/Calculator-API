@@ -1,0 +1,23 @@
+{{define "title"}}Home{{end}}
+
+{{define "main"}}
+    <h2>Your Latest Calculations</h2>
+        {{ if .Calculations }}
+        <table>
+            <tr>
+                <th>Operation</th>
+                <th>Created</th>
+                <th>Result</th>
+            </tr>
+            {{ range .Calculations }}
+            <tr>
+                <td>{{.Operation}}</td>   
+                <td>{{humanDate .Created}}</td>   
+                <td>{{.Result}}</td>   
+            </tr>
+            {{ end }}
+        </table>
+        {{ else }}
+            <p>There's nothing here to see yet!</p>
+        {{ end }}
+{{end}}
