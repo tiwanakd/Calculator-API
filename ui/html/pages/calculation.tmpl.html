@@ -1,0 +1,17 @@
+{{define "title"}}Calculation {{ .Calculation.ID }}{{end}}
+{{define "main"}}
+    {{ with .Calculation }}
+    <div class='calculator-container
+        {{ if eq .Operation "Addition" }}addition{{ end }}
+        {{ if eq .Operation "Subtraction" }}subtraction{{ end }}
+        {{ if eq .Operation "Multiplication" }}multiplication{{ end }}
+        {{ if eq .Operation "Division" }}division{{ end }}'>
+    <h2>Calculation {{ .ID }}</h2>
+    <h4>Operation: {{ .Operation }}</h4>
+    <h4>Number A: {{ .NumberA }}</h4>
+    <h4>Number B: {{ .NumberB }}</h4>
+    <h4>Result: {{ .Result }}</h4>
+    <h4 id="created">Created: {{ humanDate .Created }}</h4>
+    </div>
+    {{end}}
+{{end}}

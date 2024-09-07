@@ -1,6 +1,7 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
+    <div class="container">
     <h2>Your Latest Calculations</h2>
         {{ if .Calculations }}
         <table>
@@ -10,14 +11,15 @@
                 <th>Result</th>
             </tr>
             {{ range .Calculations }}
-            <tr>
-                <td>{{.Operation}}</td>   
-                <td>{{humanDate .Created}}</td>   
-                <td>{{.Result}}</td>   
+            <tr class="clickable-row">
+                <td><a href="/calculation/{{.ID}}">{{.Operation}}</a></td>   
+                <td><a href="/calculation/{{.ID}}">{{humanDate .Created}}</a></td>   
+                <td><a href="/calculation/{{.ID}}">{{.Result}}</a></td>   
             </tr>
             {{ end }}
         </table>
         {{ else }}
             <p>There's nothing here to see yet!</p>
         {{ end }}
+    </div>
 {{end}}

@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
+
+	"github.com/tiwanakd/Calculator-API/internal/models"
 )
 
 type Numbers struct {
@@ -161,4 +164,28 @@ func (a *api) homeView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.render(w, r, http.StatusOK, "home.tmpl.html", data)
+}
+
+func (a *api) calculationView(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		a.genericServerError(w, r, err)
+		return
+	}
+
+	calculation, err := a.calculations.Get(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			http.NotFound(w, r)
+		} else {
+			a.genericServerError(w, r, err)
+		}
+		return
+	}
+
+	data := templateData{
+		Calculation: calculation,
+	}
+
+	a.render(w, r, http.StatusOK, "calculation.tmpl.html", data)
 }

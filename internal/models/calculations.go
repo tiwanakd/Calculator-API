@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 )
 
@@ -9,7 +10,7 @@ type Calculation struct {
 	ID        int
 	Operation string
 	NumberA   int
-	NUmberB   int
+	NumberB   int
 	Result    float64
 	Created   time.Time
 }
@@ -30,8 +31,23 @@ func (m *CalculationModel) Insert(operation string, numberA, numberB int, result
 	return nil
 }
 
+func (m *CalculationModel) Get(id int) (Calculation, error) {
+	stmt := "SELECT * FROM calculations WHERE id = $1"
+	var c Calculation
+	err := m.DB.QueryRow(stmt, id).Scan(&c.ID, &c.Operation, &c.NumberA, &c.NumberB, &c.Result, &c.Created)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return Calculation{}, ErrNotFound
+		} else {
+			return Calculation{}, err
+		}
+	}
+
+	return c, nil
+}
+
 func (m *CalculationModel) GetAll() ([]Calculation, error) {
-	calculations, err := m.get("SELECT * FROM calculations")
+	calculations, err := m.getMultiple("SELECT * FROM calculations")
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +57,7 @@ func (m *CalculationModel) GetAll() ([]Calculation, error) {
 
 func (m *CalculationModel) GetCalculations(operation string) ([]Calculation, error) {
 	stmt := `SELECT * FROM calculations WHERE LOWER(operation)=LOWER($1)`
-	calculations, err := m.get(stmt, operation)
+	calculations, err := m.getMultiple(stmt, operation)
 	if err != nil {
 		return nil, err
 	}
@@ -51,14 +67,14 @@ func (m *CalculationModel) GetCalculations(operation string) ([]Calculation, err
 func (m *CalculationModel) GetLatestCalculations() ([]Calculation, error) {
 	stmt := `SELECT * FROM calculations ORDER BY created DESC LIMIT 5`
 
-	calculations, err := m.get(stmt)
+	calculations, err := m.getMultiple(stmt)
 	if err != nil {
 		return nil, nil
 	}
 	return calculations, nil
 }
 
-func (m *CalculationModel) get(stmt string, args ...any) ([]Calculation, error) {
+func (m *CalculationModel) getMultiple(stmt string, args ...any) ([]Calculation, error) {
 	rows, err := m.DB.Query(stmt, args...)
 	if err != nil {
 		return nil, err
@@ -69,7 +85,7 @@ func (m *CalculationModel) get(stmt string, args ...any) ([]Calculation, error) 
 
 	for rows.Next() {
 		var c Calculation
-		err = rows.Scan(&c.ID, &c.Operation, &c.NumberA, &c.NUmberB, &c.Result, &c.Created)
+		err = rows.Scan(&c.ID, &c.Operation, &c.NumberA, &c.NumberB, &c.Result, &c.Created)
 		if err != nil {
 			return nil, err
 		}

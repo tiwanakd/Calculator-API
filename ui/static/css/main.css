@@ -1,0 +1,108 @@
+.mainbox {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    height: 50vh;
+}
+h1{
+    color: hsl(189, 55%, 44%);
+    text-align: center;
+    font-size: 3.5em;
+}
+#homelink{
+    text-decoration: none;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px; 
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse; 
+    margin-top: 20px;
+}
+
+tr{
+    color: hsla(0, 2%, 9%, 0.815);
+    font-weight: bold;
+}
+
+th, td {
+    padding: 12px 15px; 
+    text-align: left;
+}
+
+th {
+    background-color: hsl(185, 88%, 29%);
+    color: white; 
+}
+
+td {
+    background-color: hsl(184, 78%, 90%); 
+}
+
+tr:nth-child(even) td {
+    background-color: hsl(184, 78%, 97%);
+}
+
+.clickable-row {
+    cursor: pointer;
+}
+
+.clickable-row:hover {
+    color: hsla(173, 93%, 32%, 0.884);
+}
+
+table a {
+    text-decoration: none; 
+    color: inherit; 
+}
+
+h2 {
+    color: #333; 
+    margin: 0; 
+    text-align: center;
+}
+
+p {
+    color: #666; 
+    font-size: 1.1em;
+}
+
+#created{
+    text-align: right;
+}
+
+.calculator-container {
+    width: 60%;
+    max-width: 400px; 
+    background-color: #fff; 
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+.calculator-container.addition {
+    background-color: #d4edda; 
+}
+
+.calculator-container.subtraction {
+    background-color: #f8d7da; 
+}
+
+.calculator-container.multiplication {
+    background-color: #d1ecf1; 
+}
+
+.calculator-container.division {
+    background-color: #fff3cd;
+}
