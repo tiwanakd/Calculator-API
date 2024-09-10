@@ -151,8 +151,6 @@ func (a *api) getCalculations(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *api) homeView(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Server", "Go")
-
 	calculations, err := a.calculations.GetLatestCalculations()
 	if err != nil {
 		a.genericServerError(w, r, err)

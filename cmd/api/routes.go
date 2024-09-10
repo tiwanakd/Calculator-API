@@ -1,8 +1,12 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
 
-func (a *api) routes() *http.ServeMux {
+	"github.com/justinas/alice"
+)
+
+func (a *api) routes() http.Handler {
 	router := http.NewServeMux()
 
 	//static files
@@ -21,5 +25,6 @@ func (a *api) routes() *http.ServeMux {
 	router.HandleFunc("GET /{$}", a.homeView)
 	router.HandleFunc("GET /calculation/{id}", a.calculationView)
 
-	return router
+	standard := alice.New(a.recoverPanic, a.logRequest, commonHeaders)
+	return standard.Then(router)
 }
