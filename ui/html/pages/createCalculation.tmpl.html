@@ -1,0 +1,38 @@
+{{define "title"}}New Calculation{{end}}
+{{define "main"}}
+<div class="calculator-container">
+    <form method="post" id="calcForm">
+    
+    <div class="input-group">
+        <label for="numberA">Number A</label>
+        {{with .Form.FieldErrors.numberA}}
+            <label class="error">{{.}}</label>
+        {{end}}
+        <input type="text" id="numberA" name="numberA" value="{{with .Form}}{{.A}}{{end}}">
+    </div>
+
+    <div class="input-group">
+        <label for="numberB">Number B</label>
+        {{with .Form.FieldErrors.numberB}}
+            <label class="error">{{.}}</label>
+        {{end}}
+        <input type="text" id="numberB" name="numberB" value="{{with .Form}}{{.B}}{{end}}">
+    </div>
+
+    <div class="result-div">
+        {{if ne .Form.Result 0.0}}
+        <a class="result" href="/calculation/{{.Form.Id}}">Result: {{.Form.Result}}</a>
+        {{end}}
+    </div>
+    <div class="button-group">
+        <button type="submit" name="submitbtn" value="Addition">+</button>
+        <button type="submit" name="submitbtn" value="Subtraction">-</button>
+        <button type="submit" name="submitbtn" value="Multiplication">X</button>
+        <button type="submit" name="submitbtn" value="Division">/</button>
+    </div>
+    <div class="resetdiv"> 
+        <a type="reset" id="resetbtn" href="/createCalculation">Clear</a>
+    </div>
+</form>
+</div>
+{{end}}

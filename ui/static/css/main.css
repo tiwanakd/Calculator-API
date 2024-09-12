@@ -106,3 +106,133 @@ p {
 .calculator-container.division {
     background-color: #fff3cd;
 }
+
+nav {
+    border-bottom: 1px solid #E4E5E7;
+    padding-top: 12px;
+    padding-bottom: 15px;
+    height: 10px;
+    color: #6A6C6F;
+    text-align: center;
+}
+
+nav a {
+    text-decoration: none;
+    color: hsl(189, 55%, 44%);
+    font-size: 1.2em;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+nav a:hover {
+    color: hsl(189, 91%, 22%);
+}
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+.calculator-container {
+  max-width: 300px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 20px;
+} 
+
+.button-group {
+  display: flex;
+  gap: 10px; 
+  justify-content: center; 
+  margin-top: 37px;
+  margin-bottom: 5px;
+}
+
+.button-group button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid hsl(189, 55%, 44%);
+  border-radius: 4px;
+  background-color: hsl(189, 55%, 44%);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.button-group button:hover {
+  background-color: hsl(189, 92%, 20%);
+}
+
+.result{
+    color: hsla(192, 87%, 26%, 0.973);
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    text-decoration: none;
+}
+
+.result:hover{
+    color: hsla(192, 90%, 46%, 0.973);
+}
+
+.result-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#resetbtn{
+  padding: 10px;
+  border: 1px solid hsl(2, 72%, 45%);
+  border-radius: 4px;
+  background-color: hsl(2, 72%, 45%);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.error{
+    margin-top: 5px;
+    color: red;
+    font-size: 0.8em;
+    font-weight: bold;
+    width: 100%;
+}
+
+.error + input {
+    border-color: #C0392B !important;
+    border-width: 2px !important;
+}
+
+.resetdiv{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+    width: 100%;
+}

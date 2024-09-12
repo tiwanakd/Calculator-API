@@ -19,16 +19,32 @@ type CalculationModel struct {
 	DB *sql.DB
 }
 
-func (m *CalculationModel) Insert(operation string, numberA, numberB int, result float64) error {
-	stmt := `INSERT INTO calculations (operation, number_a, number_b, result, created)
-	VALUES ($1, $2, $3, $4, NOW());`
+func (m *CalculationModel) Insert(operation string, numberA, numberB int, result float64) (int, error) {
+	// stmt := `INSERT INTO calculations (operation, number_a, number_b, result, created)
+	// VALUES ($1, $2, $3, $4, NOW());`
 
-	_, err := m.DB.Exec(stmt, operation, numberA, numberB, result)
+	// _, err := m.DB.Exec(stmt, operation, numberA, numberB, result)
+	// if err != nil {
+	// 	return err
+	// }
+
+	//this allow to get the LastInserId which is not supported for Postgres
+	query := `INSERT INTO calculations (operation, number_a, number_b, result, created)
+	VALUES ($1, $2, $3, $4, NOW()) RETURNING id`
+
+	stmt, err := m.DB.Prepare(query)
 	if err != nil {
-		return err
+		return 0, err
+	}
+	defer stmt.Close()
+
+	var id int
+	err = stmt.QueryRow(operation, numberA, numberB, result).Scan(&id)
+	if err != nil {
+		return 0, err
 	}
 
-	return nil
+	return id, nil
 }
 
 func (m *CalculationModel) Get(id int) (Calculation, error) {
