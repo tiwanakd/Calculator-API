@@ -12,6 +12,7 @@ type templateData struct {
 	Calculation  models.Calculation
 	Calculations []models.Calculation
 	Form         any
+	//ResultFlash  float64
 }
 
 func humanDate(t time.Time) string {

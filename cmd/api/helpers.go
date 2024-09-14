@@ -120,6 +120,12 @@ func (a *api) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
+func (a *api) newTemplateData(r *http.Request) templateData {
+	return templateData{
+		//ResultFlash: a.sessionManager.PopFloat(r.Context(), "resultflash"),
+	}
+}
+
 func (a *api) render(w http.ResponseWriter, r *http.Request, status int, page string, data templateData) {
 	ts, ok := a.templateCache[page]
 	if !ok {

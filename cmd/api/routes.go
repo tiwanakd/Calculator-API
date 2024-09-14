@@ -21,11 +21,13 @@ func (a *api) routes() http.Handler {
 	router.HandleFunc("GET /allcalculations", a.allCalculations)
 	router.HandleFunc("GET /getcalculations", a.getCalculations)
 
+	dynamic := alice.New(a.sessionManager.LoadAndSave)
+
 	//UI
-	router.HandleFunc("GET /{$}", a.homeView)
-	router.HandleFunc("GET /calculation/{id}", a.calculationView)
-	router.HandleFunc("GET /createCalculation", a.createCalulationView)
-	router.HandleFunc("POST /createCalculation", a.createCalulationPost)
+	router.Handle("GET /{$}", dynamic.ThenFunc(a.homeView))
+	router.Handle("GET /calculation/{id}", dynamic.ThenFunc(a.calculationView))
+	router.Handle("GET /createCalculation", dynamic.ThenFunc(a.createCalulationView))
+	router.Handle("POST /createCalculation", dynamic.ThenFunc(a.createCalulationPost))
 
 	standard := alice.New(a.recoverPanic, a.logRequest, commonHeaders)
 	return standard.Then(router)

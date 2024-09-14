@@ -1,21 +1,27 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/alexedwards/scs/postgresstore"
+	"github.com/alexedwards/scs/v2"
 	_ "github.com/lib/pq"
+
 	"github.com/tiwanakd/Calculator-API/internal/models"
 )
 
 type api struct {
-	logger        *slog.Logger
-	calculations  *models.CalculationModel
-	templateCache map[string]*template.Template
+	logger         *slog.Logger
+	calculations   *models.CalculationModel
+	templateCache  map[string]*template.Template
+	sessionManager *scs.SessionManager
 }
 
 func main() {
@@ -37,15 +43,36 @@ func main() {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
+
+	sessionManager := scs.New()
+	sessionManager.Store = postgresstore.New(db)
+	sessionManager.IdleTimeout = 12 * time.Hour
+	sessionManager.Cookie.Secure = true
+
 	api := &api{
-		logger:        logger,
-		calculations:  &models.CalculationModel{DB: db},
-		templateCache: templateCache,
+		logger:         logger,
+		calculations:   &models.CalculationModel{DB: db},
+		templateCache:  templateCache,
+		sessionManager: sessionManager,
 	}
 
-	api.logger.Info("server running at port", "addr", *addr)
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
 
-	err = http.ListenAndServe(*addr, api.routes())
+	srv := http.Server{
+		Addr:         *addr,
+		Handler:      api.routes(),
+		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	logger.Info("server running at port", "addr", *addr)
+
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	api.logger.Error(err.Error())
 	os.Exit(1)
 }

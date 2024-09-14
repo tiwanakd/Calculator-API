@@ -97,9 +97,8 @@ func (a *api) homeView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := templateData{
-		Calculations: calculations,
-	}
+	data := a.newTemplateData(r)
+	data.Calculations = calculations
 
 	a.render(w, r, http.StatusOK, "home.tmpl.html", data)
 }
@@ -121,15 +120,14 @@ func (a *api) calculationView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := templateData{
-		Calculation: calculation,
-	}
+	data := a.newTemplateData(r)
+	data.Calculation = calculation
 
 	a.render(w, r, http.StatusOK, "calculation.tmpl.html", data)
 }
 
 func (a *api) createCalulationView(w http.ResponseWriter, r *http.Request) {
-	data := templateData{}
+	data := a.newTemplateData(r)
 	data.Form = resultForm{}
 	a.render(w, r, http.StatusOK, "createCalculation.tmpl.html", data)
 }
@@ -183,9 +181,8 @@ func (a *api) createCalulationPost(w http.ResponseWriter, r *http.Request) {
 	form.B = numberB
 
 	if !form.Valid() {
-		data := templateData{
-			Form: form,
-		}
+		data := a.newTemplateData(r)
+		data.Form = form
 		a.render(w, r, http.StatusUnprocessableEntity, "createCalculation.tmpl.html", data)
 		return
 	}
@@ -199,9 +196,10 @@ func (a *api) createCalulationPost(w http.ResponseWriter, r *http.Request) {
 	form.Id = id
 	form.Result = result
 
-	data := templateData{
-		Form: form,
-	}
+	data := a.newTemplateData(r)
+	data.Form = form
+
+	//a.sessionManager.Put(r.Context(), "resultflash", result)
 
 	a.render(w, r, http.StatusOK, "createCalculation.tmpl.html", data)
 }
