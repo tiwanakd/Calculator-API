@@ -203,3 +203,135 @@ func (a *api) createCalulationPost(w http.ResponseWriter, r *http.Request) {
 
 	a.render(w, r, http.StatusOK, "createCalculation.tmpl.html", data)
 }
+
+type userSignupForm struct {
+	Name     string
+	Email    string
+	Password string
+	validator.Validator
+}
+
+func (a *api) userSignup(w http.ResponseWriter, r *http.Request) {
+	data := a.newTemplateData(r)
+	data.Form = userSignupForm{}
+	a.render(w, r, http.StatusOK, "signup.tmpl.html", data)
+}
+
+func (a *api) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	var form userSignupForm
+	err := r.ParseForm()
+	if err != nil {
+		a.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.Name = r.PostForm.Get("name")
+	form.Email = r.PostForm.Get("email")
+	form.Password = r.PostForm.Get("password")
+
+	form.CheckField(validator.NotBlank(form.Name), "name", "This field Cannot be blank")
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field Cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field Cannot be blank")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be al least 8 characters long")
+
+	if !form.Valid() {
+		data := a.newTemplateData(r)
+		data.Form = form
+		a.render(w, r, http.StatusUnprocessableEntity, "signup.tmpl.html", data)
+		return
+	}
+
+	err = a.users.Insert(form.Name, form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrDuplicateEmail) {
+			form.AddFieldError("email", "Email address alredy in use")
+
+			data := a.newTemplateData(r)
+			data.Form = form
+			a.render(w, r, http.StatusUnprocessableEntity, "signup.tmpl.html", data)
+		} else {
+			a.genericServerError(w, r, err)
+		}
+
+		return
+	}
+
+	a.sessionManager.Put(r.Context(), "flash", "Your signup was successful. Please log in.")
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+type userLoginForm struct {
+	Email    string
+	Password string
+	validator.Validator
+}
+
+func (a *api) userLogin(w http.ResponseWriter, r *http.Request) {
+	data := a.newTemplateData(r)
+	data.Form = userLoginForm{}
+	a.render(w, r, http.StatusOK, "login.tmpl.html", data)
+}
+
+func (a *api) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	var form userLoginForm
+	err := r.ParseForm()
+	if err != nil {
+		a.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.Email = r.PostForm.Get("email")
+	form.Password = r.PostForm.Get("password")
+
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be empty")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be empty")
+
+	if !form.Valid() {
+		data := a.newTemplateData(r)
+		data.Form = form
+		a.render(w, r, http.StatusUnprocessableEntity, "login.tmpl.html", data)
+		return
+	}
+
+	id, err := a.users.Authenticate(form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentails) {
+			form.AddNonFieldError("Incorrect Username or Password")
+
+			data := a.newTemplateData(r)
+			data.Form = form
+			a.render(w, r, http.StatusUnprocessableEntity, "login.tmpl.html", data)
+
+		} else {
+			a.genericServerError(w, r, err)
+		}
+
+		return
+	}
+
+	err = a.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		a.genericServerError(w, r, err)
+		return
+	}
+
+	a.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+
+	http.Redirect(w, r, "/createcalculation", http.StatusSeeOther)
+
+}
+
+func (a *api) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+	err := a.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		a.genericServerError(w, r, err)
+		return
+	}
+
+	a.sessionManager.Remove(r.Context(), "authenticatedUserID")
+	a.sessionManager.Put(r.Context(), "flash", "You've been logged out successfully")
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

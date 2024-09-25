@@ -20,6 +20,7 @@ import (
 type api struct {
 	logger         *slog.Logger
 	calculations   *models.CalculationModel
+	users          *models.UserModel
 	templateCache  map[string]*template.Template
 	sessionManager *scs.SessionManager
 }
@@ -52,6 +53,7 @@ func main() {
 	api := &api{
 		logger:         logger,
 		calculations:   &models.CalculationModel{DB: db},
+		users:          &models.UserModel{DB: db},
 		templateCache:  templateCache,
 		sessionManager: sessionManager,
 	}

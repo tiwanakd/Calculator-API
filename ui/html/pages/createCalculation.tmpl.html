@@ -2,7 +2,7 @@
 {{define "main"}}
 <div class="calculator-container">
     <form method="post" id="calcForm">
-    
+    <input type="hidden" name="csrf_token", value="{{.CSRFToken}}">
     <div class="input-group">
         <label for="numberA">Number A</label>
         {{with .Form.FieldErrors.numberA}}

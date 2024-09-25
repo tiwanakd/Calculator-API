@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"runtime/debug"
 	"strings"
+
+	"github.com/justinas/nosurf"
 )
 
 // Create a new type that will hold malformed requests
@@ -122,7 +124,9 @@ func (a *api) clientError(w http.ResponseWriter, status int) {
 
 func (a *api) newTemplateData(r *http.Request) templateData {
 	return templateData{
-		//ResultFlash: a.sessionManager.PopFloat(r.Context(), "resultflash"),
+		Flash:           a.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: a.isAuthenticated(r),
+		CSRFToken:       nosurf.Token(r),
 	}
 }
 
@@ -144,4 +148,12 @@ func (a *api) render(w http.ResponseWriter, r *http.Request, status int, page st
 
 	w.WriteHeader(status)
 	buf.WriteTo(w)
+}
+
+func (a *api) isAuthenticated(r *http.Request) bool {
+	isAuthenticated, ok := r.Context().Value(isAuthenticatedContextKey).(bool)
+	if !ok {
+		return false
+	}
+	return isAuthenticated
 }

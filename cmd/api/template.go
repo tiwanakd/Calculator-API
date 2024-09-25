@@ -9,10 +9,12 @@ import (
 )
 
 type templateData struct {
-	Calculation  models.Calculation
-	Calculations []models.Calculation
-	Form         any
-	//ResultFlash  float64
+	Calculation     models.Calculation
+	Calculations    []models.Calculation
+	Form            any
+	Flash           string
+	IsAuthenticated bool
+	CSRFToken       string
 }
 
 func humanDate(t time.Time) string {
