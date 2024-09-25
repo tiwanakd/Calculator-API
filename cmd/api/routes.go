@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/justinas/alice"
+	"github.com/tiwanakd/Calculator-API/ui"
 )
 
 func (a *api) routes() http.Handler {
 	router := http.NewServeMux()
 
 	//static files
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	router.Handle("GET /static/", http.StripPrefix("/static", fileServer))
+	router.Handle("GET /static/", http.FileServerFS(ui.Files))
 
 	//JSON API
 	router.HandleFunc("POST /add", a.calculate("Addition"))
